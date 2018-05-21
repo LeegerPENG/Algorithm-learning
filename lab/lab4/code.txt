@@ -1,0 +1,128 @@
+        int n,m,k;
+        int t,s,e;
+        int ID;
+        int ans = 0;
+        int val;
+        int times;
+        int up[] = new int [10000];
+        int down[] = new int [10000];
+        int num[] = new int[1001];
+        int dist[] = new int[1000];
+        int arrive[] = new int[1000];
+        
+        n=in.nextInt();
+        m=in.nextInt();
+        k=in.nextInt();
+        
+        for(int i = 1; i < n;i++)
+        	 dist[i]=in.nextInt();
+        
+   //   每一条路的经过时间 
+        for(int i=1;i<=m;i++) {
+        	t=in.nextInt();
+        	s=in.nextInt();
+        	e=in.nextInt();
+            down[e]++; ans-=t; 
+//           ans记录所有人的总共旅行时间
+//           现在不懂为什么减去每一个人从站牌的上车时间没关系
+//           等到了最后就懂了。 
+    ///    down[i]=j 表示在i景点下车的人的数量             
+            up[s]=Math.max(up[s],t);
+    ///    up[i]=j 表示在i景点上车的人的数量  
+        }
+        while(true) {
+//          安排把每一个加速器放在哪 这里不统计答案
+//        只是考虑应该将哪一条路的时间减去1而已 
+        	k--;
+        	if(k<=0) break;  
+            for(int i=0;i<=1000;i++) num[i]=0;
+            for (int i=2;i<=n;i++)
+                arrive[i]=Math.max(arrive[i-1],up[i-1])+dist[i-1];
+    // arrive[i]=j 记录公交车到达i景点的时间为j
+    //  到达该景点的时间等于到达该景点前一个景点的时间加上到达该景点的路的时间
+    //  或者是到达该景点的前一个景点的最晚上车的人的时间加上到达该景点的路的时间 
+            for (int i=n;i>1;i--) {
+                if(dist[i-1]>0) {
+    //  因为要求再某一条路使用加速器后经过该路的时间>=0 so。。。 
+                    num[i-1]=down[i];
+    // num[i]=j 记录如果在i-1这条路上使用加速器的话 收益的人的数量 
+                    if(arrive[i]>up[i])
+                        num[i-1]+=num[i];
+    // 换句话说 如果到达该景点的时间大于在该景点上车的最晚的人时间的话
+    // 那么在该景点的前一条道路使用加速器是可以的 
+                } else num[i-1]=0;
+    // 不然的话使用的毫无意义 因为就算汽车到了该景点，假设汽车使用加速器后第4分钟
+    // 到达该景点  然而该景点最晚上车的人为6分  那么你使用加速器等于白费
+    // 因为你必须等待最后在该景点上车的人上车以后才能出发 
+            }
+            val=0; times=0; ID=-1;
+    // 每一次要贪心的选择能让最多人收益的道路使用加速器 
+            for(int i=1;i<=n-1;i++)
+                if (val<num[i]) { val=num[i]; times=ID=i; }
+            if (ID==-1) break; else dist[ID]--;
+        }
+        for(int i=2;i<=n;i++)
+    //  这是最后你把加速器都用在了修改dist后准备统计答案了 
+            arrive[i]=Math.max(arrive[i-1],up[i-1])+dist[i-1];
+        for(int i=1;i<=n;i++)
+            ans+=arrive[i]*down[i];
+    // 答案就是车到达某一个景点的时间乘以在该点下车的人的数量
+    // 现在知道为什么一开始ans要减去每一个人的上车时间了吧 嘿嘿 
+        System.out.printf("%d\n",ans);
+
+
+
+
+
+
+
+
+                int n,m,k,ans=0;
+        int t[]= new int[10000];
+        int tm[]= new int[10000];
+        int l[]= new int[10000];
+        int r[]= new int[10000];
+        int ww[]= new int[10000];
+        int ws[]= new int[10000];
+        int ti[]= new int[10000];
+        int g[]= new int[10000];
+
+        
+
+        n=in.nextInt();
+        m=in.nextInt();
+        k=in.nextInt();
+        for(int i=1;i<n;i++)
+            t[i]=in.nextInt();
+        for(int i=1;i<=m;i++)
+        {
+            tm[i]=in.nextInt();
+            l[i]=in.nextInt();
+            r[i]=in.nextInt();
+        }
+        for(int i=1;i<=m;i++)
+            {ww[l[i]]=Math.max(ww[l[i]],tm[i]);++ws[r[i]];}
+        for(int i=1;i<=n;i++)
+            ws[i]=ws[i-1]+ws[i];
+        for(int i=2;i<=n;i++)
+            ti[i]=Math.max(ww[i-1],ti[i-1])+t[i-1];
+        for(int i=1;i<=m;i++)
+            ans+=ti[r[i]]-tm[i];
+
+        while(true){
+            
+            if(k<=0)break;
+            k--;
+            g[n]=n;g[n-1]=n;
+            for(int i=n-2;i>=1;i--)
+                if(ti[i+1]<=ww[i+1])g[i]=i+1;
+                else g[i]=g[i+1];
+            int maxn=0,maxw=0;
+            for(int i=1;i<n;i++)
+                if(ws[g[i]]-ws[i]>maxn&&t[i]>0)
+                {maxn=ws[g[i]]-ws[i];maxw=i;}
+            t[maxw]--;ans-=maxn;
+            for(int i=1;i<=n;i++)
+                ti[i]=Math.max(ww[i-1],ti[i-1])+t[i-1];
+        }
+        System.out.printf("%d\n",ans);
